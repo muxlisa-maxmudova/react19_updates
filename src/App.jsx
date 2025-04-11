@@ -1,16 +1,24 @@
 import React, {useState} from 'react'
 import {updateNameInDB} from "./api.js";
 function App(){
-   const [name, setName] = useState(
-       ()=>JSON.parse(localStorage.getItem("name"))|| "Anonymous user"
-   )
+    const [name, setName] = useState(
+        ()=>JSON.parse(localStorage.getItem("name"))||"Anonymous user"
+    )
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState(null)
     async function handleSubmit(formAction){
-       try {
-           const newName = await updateNameInDB(formAction.get("name"));
-           setName(newName)
-       } catch (error) {
-           console.log(error)
-       }
+        setLoading(true)
+        setError(null)
+        try{
+            const newName = await updateNameInDB(formAction.get("name"))
+            setName(newName)
+        } catch (error) {
+            console.error(error)
+            setError(error)
+        }
+        finally{
+            setLoading(false)
+        }
     }
     return (
         <>
@@ -18,7 +26,7 @@ function App(){
                 Current User: <span>{name}
             </span>
             </p>
-            <form action={handleSubmit}> //handle submit exists inside action, but name attribute is needed to amke it function
+            <form>
                 <input
                 type="text"
                 name={"name"}
